@@ -16,7 +16,7 @@ public with sharing class AccountProcessor {
             
             // Verificar e modificar o Type apenas no clone (não no registro original)
             if (displayAccount.Type == 'Customer - Direct') {
-                displayAccount.Type = 'Customer - Robert';
+                displayAccount.Type = 'Customer - Kelvin';
             } else {
                 displayAccount.Type = 'Customer - Channel';
             }
