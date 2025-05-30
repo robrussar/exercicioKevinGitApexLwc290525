@@ -7,24 +7,36 @@ public with sharing class AccountProcessor {
                                  FROM Account 
                                  WHERE Type != null];
         
-        // Clonar os registros para evitar alterar os originais
-        List<Account> accountsForDisplay = new List<Account>();
+        List<Account> accountsToUpdate = new List<Account>();
         
         for (Account acc : accounts) {
-            // Criar um clone não-persistente da conta
-            Account displayAccount = acc.clone(false, true, false, false);
+            // Adicionar mensagem à descrição
+            acc.Description = (acc.Description != null ? acc.Description + ' - ' : '') + 'Alterado por Robert Russar';
             
-            // Verificar e modificar o Type apenas no clone (não no registro original)
-            if (displayAccount.Type == 'Customer - Direct') {
-                displayAccount.Type = 'Customer - Kelvin';
+            // Definir Active__c como true (assumindo que é um campo booleano)
+            acc.Active__c = 'Yes';
+            
+            // Verificar e modificar o Type conforme regra
+            if (acc.Type == 'Customer - Direct') {
+                acc.Type = 'Customer - Kevin';
             } else {
-                displayAccount.Type = 'Customer - Channel';
+                acc.Type = 'Customer - Channel';
             }
             
-            accountsForDisplay.add(displayAccount);
+            accountsToUpdate.add(acc);
         }
         
-        // Retornar os registros clonados com Type modificado (sem atualizar o banco de dados)
-        return accountsForDisplay;
+        // Atualizar os registros no banco de dados
+        if (!accountsToUpdate.isEmpty()) {
+            try {
+                update accountsToUpdate;
+            } catch (Exception e) {
+                System.debug('Erro ao atualizar contas: ' + e.getMessage());
+                throw new AuraHandledException('Erro ao atualizar contas: ' + e.getMessage());
+            }
+        }
+        
+        // Retornar os registros atualizados
+        return accountsToUpdate;
     }
 }
